@@ -33,16 +33,16 @@ itaee <- itaee_ %>%
   left_join(estados, by = c("estado"="BIE")) %>% select(-estado)
   
 
-pibe <- read_csv("../data/bie/raw/pibe_constantes.csv", col_types = cols(),
+pibe <- read_csv("../data/bie/raw/pibe.csv", col_types = cols(),
       skip=3, locale=locale(encoding="latin3")) %>% 
-  head(-malas_filas) %>% 
+  head(-(malas_filas + 1)) %>% 
   set_names(names(.) %>% str_replace(" r1.*", "")) %>% 
   gather(Estado, pibe, Aguascalientes:Zacatecas) %>% 
   mutate(año = Periodo %>% str_c("1201") %>% ymd) %>% 
   select(año, Estado, pibe) %>% 
   left_join(estados, by=c("Estado"="BIE")) %>% select(-Estado) %>% 
   rename(Estado = Estado.y)
-
+# edvidarez: se agrego uno mas en malas filas
 
 write_csv(itaee, "../data/bie/processed/itaee.csv")  
   

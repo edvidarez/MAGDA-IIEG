@@ -24,6 +24,9 @@ leer_multibanca <- function (pestagna_id, periodo, output = FALSE, bancos = NULL
 
     archivo_ <- file.path(dir_cnbv, "raw", "BM_Operativa_%s.xls") %>% sprintf(periodo)
     if (file.exists(archivo_)) {
+        
+        cat(sprintf("archivo xls existe"))
+
         mb_ <- read_excel(archivo_, sheet = nombre_, skip = 1) %>%  { 
                 names(.)[1:4] <- c("entidad", "cvegeo", "colonia", "valor")
                 as_data_frame(.)
@@ -45,7 +48,7 @@ leer_multibanca <- function (pestagna_id, periodo, output = FALSE, bancos = NULL
         # periodo <- "201612"
         # output <- FALSE
         # bancos <- c("BBVA Bancomer", "Banamex")
-
+        cat(sprintf("archivo xls no existe"))
         pestañas_rnm <- c(
         "Número de Transacciones en Cajeros Automáticos" = 
         "Num de Transac en Cajeros Aut")
@@ -54,6 +57,7 @@ leer_multibanca <- function (pestagna_id, periodo, output = FALSE, bancos = NULL
         sprintf(periodo)
 
         if ("Hoja1" %in% excel_sheets(archivo_)) {
+            cat(sprintf("archivo xlsx existe y Hoja1"))
             mb_0 <- read_excel(archivo_, sheet = "Hoja1", col_types = c("text", "text", "text", "text", "text", "text", "skip","text", "numeric", "skip", "skip")) %>% 
             select(tipo  = dl_producto_financiero, 
                     cvegeo  = cve_inegi, 
@@ -67,6 +71,8 @@ leer_multibanca <- function (pestagna_id, periodo, output = FALSE, bancos = NULL
                     tipo = tipo %>% str_replace_all(pestañas_rnm)) %>% 
             filter(tipo == pestagna_id, cvegeo != "L")
         } else {
+            cat(sprintf("archivo xlsx existe y Datos"))
+
             mb_0 <- read_excel(archivo_, sheet = "Datos", col_types = c("text", "text", "text", "text", "text", "text", "skip", "text", "numeric", "skip", "skip", "skip")) %>% 
                 select(tipo = `Producto Financiero`, 
                         cvegeo  = `Cve Localidad`, 
@@ -94,6 +100,7 @@ leer_multibanca <- function (pestagna_id, periodo, output = FALSE, bancos = NULL
         mb <- bind_rows(mb_1, mb_2) %>% 
             spread(banco, valor)
     }
+    print(mb)
     return (mb)
 }
 

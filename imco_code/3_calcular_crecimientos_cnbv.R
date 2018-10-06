@@ -14,8 +14,10 @@ cnbv <- read_csv("../data/cnbv/processed" %>% file.path(
   select(trimestre, CVEENT, atm_1 = atm_selecto) %>% 
   filter(trimestre > "2011-03-01")
 
+
+
 gg_cnbv <- cnbv %>% 
-  filter(trimestre < "2016-12_01") %>% 
+  filter(trimestre < "2016-12-01") %>% 
   ggplot(aes(trimestre, atm_1)) + 
   facet_wrap(~CVEENT, scales = "free_y") +
   geom_line()
