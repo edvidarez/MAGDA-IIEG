@@ -16,7 +16,7 @@ aplicar_crecimiento <- function(base, crec, columnas) {
     filter(!is.na(crec_fit)) %>% 
     group_by_(.dots = columnas) %>% 
     mutate(es_2014 = (trimestre >= "2014-12-01") & 
-            (lag(trimestre) < "2014-12-01"), 
+            (dplyr::lag(trimestre) < "2014-12-01"), 
         crec_acum = cumprod(1 + crec_fit),
         crec_14 = sum(crec_acum[es_2014]) %>% 
             replace(. == 0, 1), 
@@ -101,6 +101,24 @@ edo_crec <- read_csv("../data/resultados/crecimiento" %>% file.path(
 
 edo_eco <- aplicar_crecimiento(edo_0, edo_crec, 
     c("CVEENT", "Estado"))
+
+#### edvidarez
+base <- edo_0
+crec <- edo_crec
+columnas <- c("CVEENT", "Estado")
+datos <- inner_join(base, crec, by=columnas) %>% 
+  mutate(acteco = NA) %>% 
+  arrange_(.dots = columnas %>% c("trimestre"))
+calc_crec <- datos %>% 
+  filter(!is.na(crec_fit)) %>% 
+  group_by_(.dots = columnas) %>% 
+  mutate(es_2014 = (trimestre >= "2014-12-01") & 
+           (dplyr::lag(trimestre) < "2014-12-01"), 
+         crec_acum = cumprod(1 + crec_fit),
+         crec_14 = sum(crec_acum[es_2014]) %>% 
+           replace(. == 0, 1), 
+         acteco = ae_175*crec_acum/crec_14)
+####
 
 write_csv(edo_eco, 
   "../data/resultados/integrado/selecto_estado.csv")
