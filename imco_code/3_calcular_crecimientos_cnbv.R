@@ -10,14 +10,14 @@ itaee <- read_csv("../data/bie/processed/itaee.csv") %>%
   select(trimestre = fecha, CVEENT, Estado, itaee = original)
 
 cnbv <- read_csv("../data/cnbv/processed" %>% file.path(
-  "x11_selecto_estados_martes.csv")) %>%
+  "x11_selecto_estados_martes_actualizado.csv")) %>%
   select(trimestre, CVEENT, atm_1 = atm_selecto) %>% 
   filter(trimestre > "2011-03-01")
 
 
 
 gg_cnbv <- cnbv %>% 
-  filter(trimestre < "2016-12-01") %>% 
+  filter(trimestre < "2017-12-01") %>% 
   ggplot(aes(trimestre, atm_1)) + 
   facet_wrap(~CVEENT, scales = "free_y") +
   geom_line()
@@ -34,10 +34,10 @@ if (entrena_modelo) {
       by = c("trimestre", "CVEENT")) %>% 
     group_by(CVEENT) %>% arrange(trimestre) %>% 
     mutate_at(vars(itaee, atm_1), 
-      funs(crec = . %>% divide_by(lag(., 1)) %>% subtract(1))) %>%
-    mutate(atm_crec_4 = lag(atm_1_crec, 4), 
-      atm_1_anual = atm_1/lag(atm_1, 4) - 1) %>% 
-    filter(trimestre < "2016-01-01", trimestre > "2012-12-01")
+      funs(crec = . %>% divide_by(dplyr::lag(., 1)) %>% subtract(1))) %>%
+    mutate(atm_crec_4 = dplyr::lag(atm_1_crec, 4), 
+      atm_1_anual = atm_1/dplyr::lag(atm_1, 4) - 1) %>% 
+    filter(trimestre < "2016-12-01", trimestre > "2012-12-01")
   
   # Seguimos el modelo 
   
@@ -85,9 +85,9 @@ if (entrena_modelo) {
   }
   
   write_csv(tidy_crec_2, 
-    "../data/resultados/indicadores/coeficientes_v2.csv")
+    "../data/resultados/indicadores/coeficientes_v2_actualizado.csv")
   
-  saveRDS(modelo_crec, "../models/modelo_crecimiento_nuevo.rds")
+  saveRDS(modelo_crec, "../models/modelo_crecimiento_nuevo_actualizado.rds")
 } else {
   estados_ <- itaee %>% 
     select(CVEENT, Estado) %>% unique
@@ -101,7 +101,7 @@ if (entrena_modelo) {
       atm_1_anual = atm_1/lag(atm_1, 4) - 1) %>% 
     filter(trimestre > "2011-07-01")
   
-  modelo_crec <- readRDS("../data/referencias/modelo_crecimiento.rds")
+  modelo_crec <- readRDS("../data/referencias/modelo_crecimiento_actualizado.rds")
 }
   
 
@@ -129,11 +129,11 @@ gg_estado <- estado_fit %>%
 print(gg_estado)
 
 ggsave(plot = gg_estado, 
-  "../visualization/figures/modelo_x11_selecto_v2.eps", 
+  "../visualization/figures/modelo_x11_selecto_v2_actualizado.eps", 
   width = 16, height = 9, dpi = 100)
 
 
-metro_data <- read_csv("x11_selecto_zonas_metro_martes.csv" %>% 
+metro_data <- read_csv("x11_selecto_zonas_metro_martes_actualizado.csv" %>% 
       file.path("../data/cnbv/processed", .)) %>%
   mutate(CVEMET = CVEMET %>% str_pad(3, "left", "0"), 
       CVEENT = CVEENT %>% str_pad(2, "left", "0")) %>% 
@@ -151,10 +151,10 @@ metro_fit <- metro_fit %>%
   select(trimestre, CVEENT, CVEMET, zona_metro, crec_fit = .fitted)
   
 write_csv(metro_fit, 
-  "../data/resultados/crecimiento/selecto_zona_metro_martes.csv")
+  "../data/resultados/crecimiento/selecto_zona_metro_martes_actualizado.csv")
 
 write_csv(estado_fit, 
-  "../data/resultados/crecimiento/selecto_estado_martes.csv")
+  "../data/resultados/crecimiento/selecto_estado_martes_actualizado.csv")
 
 
 #### Generamos tasas de crecimiento anualizado acumulado. ####

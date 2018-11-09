@@ -54,14 +54,14 @@ datos_shape <- function (shape, nivel = "localidad") {  #
 # 1. Leer Shapefiles
 
 locs_shp <- readOGR("../data/inegi/marco_geo/processed", 
-  "datos_localidades", stringsAsFactors = FALSE)
+  "datos_localidades_actualizado", stringsAsFactors = FALSE)
 
 # Los shapefiles de municipios y estados no son necesarios para el
 # análisis.  Para correrlos, hay que antes cargarlos en QGIS como se 
 # hizo con las localidades. 
 
 muns_shp <- readOGR("../data/inegi/marco_geo/processed",
-  "datos_municipios",  stringsAsFactors = FALSE)
+  "datos_municipios_actualizado",  stringsAsFactors = FALSE)
 
 # edos_shp <- readOGR("../data/inegi/marco_geo/processed",
 #   "datos_estados",     stringsAsFactors = FALSE)
@@ -103,10 +103,10 @@ municipios_datos <- muns_data %>%
 # 4. Escribir tablas
 
 write_csv(locs_data, 
-    "../data/viirs/processed/locs_luces_175.csv")
+    "../data/viirs/processed/locs_luces_175_actualizado.csv")
 
 write_csv(municipios_datos, 
-      "../data/viirs/processed/mun_luces_175.csv")
+      "../data/viirs/processed/mun_luces_175_actualizado.csv")
 
 # write_csv(estados_datos, "../data/viirs/processed_tables/edos_luces_175.csv")
 

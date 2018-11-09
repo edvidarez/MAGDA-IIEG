@@ -9,13 +9,14 @@ entrena_filtro <- TRUE  # Primero se entrenan (filtro == TRUE) y después
 # El sufijo BASE se refiere al perioddo de entrenamiento. 
 # Incluso con datos nuevos. 
 empieza_base <- ymd("2011-04-01")  # Verificar en la serie. 
-termina_base <- ymd("2016-10-01")  # De acuerdo al primer modelo. 
+#2016-10-01
+termina_base <- ymd("2017-12-01")  # De acuerdo al primer modelo. 
 
 
 # Leemos la tabla que ya trae la info por municipio de Banamex y
 # Bancomer, generada por Diego
 spr_src <- read_csv("../data/cnbv/processed" %>% file.path(
-    "grupos_municipios_prex11.csv"), 
+    "grupos_municipios_prex11_actualizado.csv"), 
     col_types = cols("c", "D", "n", "n", "n", "n")) %>% 
   mutate(CVEMUN = CVEMUN %>% str_pad(5, "left", "0")) %>% 
   filter(fecha >= empieza_base) %>% 
@@ -139,7 +140,7 @@ if (entrena_filtro) {
 # También distinguir las que se suman y se multiplican.
 
 fechas <- spr_src$fecha %>% unique() %>% extract(1:n_fechas)
-# fechas <- fechas[1:68]  # para 2016-10
+fechas <- fechas[1:67]  # para 2016-10
 
 trend_ <- lapply(l1[!is.err], trend) %>%
   {do.call(cbind, .)} %>%
@@ -211,7 +212,7 @@ spr_final_tent <- spr_final_tent_ %>%
   gather("fecha", "trans", starts_with("20"))
 
 write_csv(spr_final_tent, 
-  "../data/cnbv/processed/municipios_todos_x11.csv")
+  "../data/cnbv/processed/municipios_todos_x11_actualizado.csv")
 
 
 
@@ -254,11 +255,11 @@ spr_final <- spr_final_tent %>%
   bind_rows(corte_sust)
 
 write_csv(spr_final,
-  "../data/cnbv/processed/municipios_select_x11.csv")
+  "../data/cnbv/processed/municipios_select_x11_actualizado.csv")
 
 
 cnbv_input_ <- read_csv("../data/cnbv/processed" %>% file.path(
-      "municipios_select_x11.csv")) %>% 
+      "municipios_select_x11_actualizado.csv")) %>% 
   gather("fecha", "cnbv_x11", starts_with("20"), convert = TRUE) %>% 
   spread(banco, cnbv_x11, fill = 0) %>% 
   transmute(CVEMUN = CVEMUN, fecha = fecha, 
@@ -280,7 +281,7 @@ cnbv_input <- cnbv_input_ %>%
       funs(. %>% sum(na.rm=TRUE)))
 
 write_csv(cnbv_input, 
-  "../data/cnbv/processed/municipios_x11_input.csv")
+  "../data/cnbv/processed/municipios_x11_input_actualizado.csv")
 
 
 spr_prueba <- cnbv_input %>% 
@@ -295,7 +296,7 @@ gg_prueba <- spr_prueba %>%
 print(gg_prueba)
 
 ggsave(plot = gg_prueba, 
-  "../visualization/figures/cnbv_confiltros.png",
+  "../visualization/figures/cnbv_confiltros_actualizado.png",
   height = 9, width = 16, dpi = 100)
 
 
@@ -313,7 +314,7 @@ metros_input <- read_csv("zonas_metro_estado_ok.csv" %>%
   rename(zona_metro = nombre_corto)
 
 write_csv(metros_input, 
-  "../data/cnbv/processed/zonas_metro_x11_input.csv")
+  "../data/cnbv/processed/zonas_metro_x11_input_actualizado.csv")
 
 estados_input <- cnbv_input %>%
   mutate(CVEENT = CVEMUN %>% str_sub(1, 2)) %>% select(-CVEMUN) %>% 
@@ -321,7 +322,7 @@ estados_input <- cnbv_input %>%
   summarize_all(funs(sum))
 
 write_csv(estados_input, 
-  "../data/cnbv/processed/estados_x11_input.csv")
+  "../data/cnbv/processed/estados_x11_input_actualizado.csv")
   
   
   

@@ -6,8 +6,9 @@ dir_cnbv <- "../data/cnbv"
 
 # posible diferencia por:  
 #   empieza <- "2011-03-01"
+#   actualizado de "2017-03-01"
 empieza <- "2011-03-01" %>% as.Date
-termina <- "2017-03-01" %>% as.Date
+termina <- "2017-12-01" %>% as.Date
 
 
 # archivo, pestaña, output, bancos = NULL
@@ -129,7 +130,7 @@ MB_x11 <- MB_frame %>% # filter(tipo == "transacciones_atm") %>%
     summarize_at(vars(bancomer, banamex, valor), funs(. %>% sum(na.rm = T))) %>%
     mutate(otros = valor - bancomer - banamex) 
 
-write_csv(MB_x11, "../data/cnbv/processed/grupos_municipios_prex11.csv")
+write_csv(MB_x11, "../data/cnbv/processed/grupos_municipios_prex11_actualizado.csv")
 
 
 

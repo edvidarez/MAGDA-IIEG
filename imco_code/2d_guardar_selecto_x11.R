@@ -9,7 +9,7 @@ importa_tabla <- TRUE
 
 if (!importa_tabla) {
   muns_selecto <- read.csv(
-    "../data/cnbv/processed/predictor_x11_selecto_estatal_corregido.csv",
+    "../data/cnbv/processed/predictor_x11_selecto_estatal_corregido_actualizado.csv",
     colClasses = c("character", "character", "character", "numeric"), 
     stringsAsFactors = FALSE)
 } else {
@@ -19,7 +19,7 @@ if (!importa_tabla) {
       predictor_x11 %>% set_names(CVEENT) }
    
   muns_selecto <- read_csv("../data/cnbv/processed" %>% 
-      file.path("municipios_x11_input.csv" )) %>% 
+      file.path("municipios_x11_input_actualizado.csv" )) %>% 
     gather(clave_tmp, selecto_x11, ends_with("_x11")) %>% 
     mutate(CVEENT = CVEMUN %>% str_sub(1, 2),
       predictor_x11 = predictores[CVEENT]) %>% select(-CVEENT) %>%
@@ -41,7 +41,7 @@ gg_selecto <- estados_selecto %>%
 
 
 write_csv(estados_selecto, 
-  "../data/cnbv/processed/x11_selecto_estados_martes.csv")
+  "../data/cnbv/processed/x11_selecto_estados_martes_actualizado.csv")
 
 metros_selecto <- read_csv(
       "../data/referencias/zonas_metro_estado_ok.csv") %>% 
@@ -55,7 +55,7 @@ metros_selecto <- read_csv(
       predictor_x11 = max(predictor_x11))
 
 write_csv(metros_selecto, 
-  "../data/cnbv/processed/x11_selecto_zonas_metro_martes.csv")
+  "../data/cnbv/processed/x11_selecto_zonas_metro_martes_actualizado.csv")
   
 
 

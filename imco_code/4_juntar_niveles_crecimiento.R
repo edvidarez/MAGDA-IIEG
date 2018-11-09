@@ -15,8 +15,8 @@ aplicar_crecimiento <- function(base, crec, columnas) {
   calc_crec <- datos %>% 
     filter(!is.na(crec_fit)) %>% 
     group_by_(.dots = columnas) %>% 
-    mutate(es_2014 = (trimestre >= "2014-12-01") & 
-            (dplyr::lag(trimestre) < "2014-12-01"), 
+    mutate(es_2014 = (trimestre >= "2015-12-01") & 
+            (dplyr::lag(trimestre) < "2015-12-01"), 
         crec_acum = cumprod(1 + crec_fit),
         crec_14 = sum(crec_acum[es_2014]) %>% 
             replace(. == 0, 1), 
@@ -39,13 +39,13 @@ crecimiento_vector <- function(crecimiento, base, indice) {
 
 ## Por zonas metropolitanas. 
 
-metros_0 <- read_csv("por_zonas_metro.csv" %>% 
+metros_0 <- read_csv("por_zonas_metro_actualizado.csv" %>% 
       file.path("../data/resultados/acteco", .)) %>% 
   mutate(CVEMET = CVEMET %>% str_pad(3, "left", "0"),
          CVEENT = CVEENT %>% str_pad(2, "left", "0")) %>%
   select(CVEMET, CVEENT, zona_metro, ae_175)
 
-metros_crec <- read_csv("selecto_zona_metro_martes.csv" %>% 
+metros_crec <- read_csv("selecto_zona_metro_martes_actualizado.csv" %>% 
   file.path("../data/resultados/crecimiento", .)) %>% 
   mutate(CVEMET = CVEMET %>% str_pad(3, "left", "0"),
          CVEENT = CVEENT %>% str_pad(2, "left", "0")) %>% 
@@ -58,10 +58,10 @@ metros_eco <- left_join(metros_0, metros_crec,
   group_by_(.dots = cols_crec) %>% 
   arrange_(.dots = cols_crec %>% c("trimestre")) %>% 
   mutate(acteco = crecimiento_vector(crec_fit, ae_175, 
-              trimestre == "2014-12-01"))
+              trimestre == "2015-12-01"))
 
 write_csv(metros_eco %>% select(-ae_175), 
-  "../data/resultados/integrado/selecto_zm_edo_martes.csv")
+  "../data/resultados/integrado/selecto_zm_edo_martes_actualizado.csv")
 
 # Checar VAR_ANUAL y comparar con CRECIMIENTO_ACUMULADO de INEGI. 
 # y reportes.  
@@ -69,16 +69,16 @@ metros_eco_2 <- metros_eco %>%
   group_by(trimestre, CVEMET, zona_metro) %>% 
   summarize(magda = sum(acteco, na.rm = TRUE)) %>% 
   group_by(CVEMET, zona_metro) %>% arrange(trimestre) %>% 
-  mutate(var_trim  = magda/lag(magda) - 1,   
-         var_anual = magda/lag(magda, 4) - 1, 
-      anual_acum = (var_anual + lag(var_anual) + 
-          lag(var_anual,2) + lag(var_anual,3))/4) %>% 
+  mutate(var_trim  = magda/dplyr::lag(magda) - 1,   
+         var_anual = magda/dplyr::lag(magda, 4) - 1, 
+      anual_acum = (var_anual + dplyr::lag(var_anual) + 
+                      dplyr::lag(var_anual,2) + dplyr::lag(var_anual,3))/4) %>% 
   arrange(CVEMET, zona_metro)
 
 write_csv(metros_eco_2, 
-  "../data/resultados/integrado/selecto_zona_metro_martes.csv")
+  "../data/resultados/integrado/selecto_zona_metro_martes_actualizado.csv")
 
-
+#edvidarez: Aqui hace falta algo por que 2017 da NAs
 metros_formato <- metros_eco_2 %>% ungroup %>% 
   select(trimestre, zona_metro, magda, anual_acum) %>% 
   filter(month(trimestre) == 12) %>% 
@@ -88,16 +88,16 @@ metros_formato <- metros_eco_2 %>% ungroup %>%
   unite("medida_año", medida, año) %>% 
   spread(medida_año, valor)
 
-write_csv(metros_formato, "../data/resultados/integrado/reportando.csv")  
+write_csv(metros_formato, "../data/resultados/integrado/reportando_actualizado.csv")  
 
 
 ## Por estado. 
 
 edo_0 <- read_csv("../data/bie/processed/pibe.csv") %>% 
-  filter(año == "2014-12-01") %>% rename(ae_175 = pibe)
+  filter(año == "2015-12-01") %>% rename(ae_175 = pibe)
 
 edo_crec <- read_csv("../data/resultados/crecimiento" %>% file.path(
-  "selecto_estado_martes.csv"))
+  "selecto_estado_martes_actualizado.csv"))
 
 edo_eco <- aplicar_crecimiento(edo_0, edo_crec, 
     c("CVEENT", "Estado"))
@@ -112,8 +112,8 @@ datos <- inner_join(base, crec, by=columnas) %>%
 calc_crec <- datos %>% 
   filter(!is.na(crec_fit)) %>% 
   group_by_(.dots = columnas) %>% 
-  mutate(es_2014 = (trimestre >= "2014-12-01") & 
-           (dplyr::lag(trimestre) < "2014-12-01"), 
+  mutate(es_2014 = (trimestre >= "2015-12-01") & 
+           (dplyr::lag(trimestre) < "2015-12-01"), 
          crec_acum = cumprod(1 + crec_fit),
          crec_14 = sum(crec_acum[es_2014]) %>% 
            replace(. == 0, 1), 
@@ -121,7 +121,7 @@ calc_crec <- datos %>%
 ####
 
 write_csv(edo_eco, 
-  "../data/resultados/integrado/selecto_estado.csv")
+  "../data/resultados/integrado/selecto_estado_actualizado.csv")
 
 
 gg_estados <- edo_eco %>% 
@@ -141,7 +141,7 @@ gg_estados <- edo_eco %>%
 print(gg_estados)
 
 ggsave(plot = gg_estados, 
-  "../visualization/figures/estados_x11_selecto_v2.eps", 
+  "../visualization/figures/estados_x11_selecto_v2_actualizado.eps", 
   width = 16, height = 9, dpi = 100)
 
 

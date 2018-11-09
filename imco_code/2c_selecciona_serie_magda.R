@@ -3,7 +3,7 @@
 entrena_filtro <- FALSE
 
 
-x11 <- read.csv("../data/cnbv/processed/municipios_x11_input.csv",
+x11 <- read.csv("../data/cnbv/processed/municipios_x11_input_actualizado.csv",
     stringsAsFactors = F, 
     colClasses = c("character", "character", "numeric", "numeric",
     "numeric", "numeric", "numeric", "numeric", "numeric")) %>%
@@ -71,7 +71,7 @@ x11_selecto <- x11 %>%
   rename(selecto_x11 = valor)
 
 write.csv(x11_selecto, row.names = FALSE,
-  "../data/cnbv/processed/predictor_x11_selecto_estatal_corregido.csv")
+  "../data/cnbv/processed/predictor_x11_selecto_estatal_corregido_actualizado.csv")
 
 
 
