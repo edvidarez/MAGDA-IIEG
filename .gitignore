@@ -1,5 +1,7 @@
 .Rproj.user
+data/viirs*
 .Rhistory
 .RData
 .Ruserdata
+.DS_Store
 *.directory

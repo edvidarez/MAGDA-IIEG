@@ -13,13 +13,23 @@ cnbv <- read_csv("../data/cnbv/processed" %>% file.path(
   "x11_selecto_estados_martes_actualizado.csv")) %>%
   select(trimestre, CVEENT, atm_1 = atm_selecto) %>% 
   filter(trimestre > "2011-03-01")
-
+cnbv <- read_csv("../data/cnbv/processed" %>% file.path(
+  "x11_selecto_municipios_martes_actualizado.csv")) %>%
+  select(trimestre, CVEMUN, atm_1 = atm_selecto) %>% 
+  filter(trimestre > "2011-03-01")
 
 
 gg_cnbv <- cnbv %>% 
-  filter(trimestre < "2017-12-01") %>% 
+  filter(trimestre < "2018-09-01") %>% 
   ggplot(aes(trimestre, atm_1)) + 
   facet_wrap(~CVEENT, scales = "free_y") +
+  geom_line()
+print(gg_cnbv)
+## por municipio
+gg_cnbv <- cnbv %>% 
+  filter(trimestre < "2018-09-01") %>% 
+  ggplot(aes(trimestre, atm_1)) + 
+  facet_wrap(~CVEMUN, scales = "free_y") +
   geom_line()
 print(gg_cnbv)
   
@@ -37,7 +47,7 @@ if (entrena_modelo) {
       funs(crec = . %>% divide_by(dplyr::lag(., 1)) %>% subtract(1))) %>%
     mutate(atm_crec_4 = dplyr::lag(atm_1_crec, 4), 
       atm_1_anual = atm_1/dplyr::lag(atm_1, 4) - 1) %>% 
-    filter(trimestre < "2016-12-01", trimestre > "2012-12-01")
+    filter(trimestre < "2017-12-01", trimestre > "2012-12-01")
   
   # Seguimos el modelo 
   
@@ -85,9 +95,9 @@ if (entrena_modelo) {
   }
   
   write_csv(tidy_crec_2, 
-    "../data/resultados/indicadores/coeficientes_v2_actualizado.csv")
+    "../data/resultados/indicadores/coeficientes_v2_actualizado_2017.csv")
   
-  saveRDS(modelo_crec, "../models/modelo_crecimiento_nuevo_actualizado.rds")
+  saveRDS(modelo_crec, "../models/modelo_crecimiento_nuevo_actualizado_2017.rds")
 } else {
   estados_ <- itaee %>% 
     select(CVEENT, Estado) %>% unique
@@ -129,12 +139,13 @@ gg_estado <- estado_fit %>%
 print(gg_estado)
 
 ggsave(plot = gg_estado, 
-  "../visualization/figures/modelo_x11_selecto_v2_actualizado.eps", 
+  "../visualization/figures/modelo_x11_selecto_v2_actualizado_2017.eps", 
   width = 16, height = 9, dpi = 100)
 
+lag   <- dplyr::lag
 
 metro_data <- read_csv("x11_selecto_zonas_metro_martes_actualizado.csv" %>% 
-      file.path("../data/cnbv/processed", .)) %>%
+    file.path("../data/cnbv/processed", .)) %>%
   mutate(CVEMET = CVEMET %>% str_pad(3, "left", "0"), 
       CVEENT = CVEENT %>% str_pad(2, "left", "0")) %>% 
   rename(atm_1 = atm_selecto) %>% 
@@ -144,17 +155,27 @@ metro_data <- read_csv("x11_selecto_zonas_metro_martes_actualizado.csv" %>%
       atm_1_anual = atm_1/lag(atm_1, 4) - 1) %>% ungroup %>% 
   filter(!is.na(atm_crec_4))
 
+muns_data <- read_csv("x11_selecto_municipios_martes_actualizado.csv" %>% 
+                         file.path("../data/cnbv/processed", .)) %>%
+  rename(atm_1 = atm_selecto) %>% 
+  group_by(CVEMUN) %>% arrange(trimestre) %>% 
+  mutate(atm_1_crec = atm_1/lag(atm_1) - 1, 
+         atm_crec_4 = lag(atm_1_crec, 4), 
+         atm_1_anual = atm_1/lag(atm_1, 4) - 1) %>% ungroup %>% 
+  filter(!is.na(atm_crec_4))
+
 metro_fit <- augment(modelo_crec, newdata = metro_data) 
+muns_fit <- augment(modelo_crec, newdata = muns_data) 
 if ("nombre_corto" %in% names(metro_fit)) {
   rename(metro_fit, zona_metro = nombre_corto) }
 metro_fit <- metro_fit %>% 
   select(trimestre, CVEENT, CVEMET, zona_metro, crec_fit = .fitted)
   
 write_csv(metro_fit, 
-  "../data/resultados/crecimiento/selecto_zona_metro_martes_actualizado.csv")
+  "../data/resultados/crecimiento/selecto_zona_metro_martes_actualizado_2017.csv")
 
 write_csv(estado_fit, 
-  "../data/resultados/crecimiento/selecto_estado_martes_actualizado.csv")
+  "../data/resultados/crecimiento/selecto_estado_martes_actualizado_2017.csv")
 
 
 #### Generamos tasas de crecimiento anualizado acumulado. ####

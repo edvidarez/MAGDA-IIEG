@@ -5,10 +5,10 @@
 
 # Verificar cuál es el último mes disponible en 
 # http://portafolioinfo.cnbv.gob.mx/PUBLICACIONES/IO/Paginas/bm.aspx
-ultimo_mes <- as.Date("2017-03-01")
-
-
-tags_meses <- seq(as.Date("2011-03-01"), ultimo_mes, by = "1 month") %>% 
+ultimo_mes <- as.Date("2018-09-01")
+#2017-03-01
+#2011-03-01
+tags_meses <- seq(as.Date("2018-01-01"), ultimo_mes, by = "1 month") %>% 
   format("%Y%m")
 bm_raw_dir <- "../data/cnbv/raw/"
 

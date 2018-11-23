@@ -212,7 +212,7 @@ spr_final_tent <- spr_final_tent_ %>%
   gather("fecha", "trans", starts_with("20"))
 
 write_csv(spr_final_tent, 
-  "../data/cnbv/processed/municipios_todos_x11_actualizado.csv")
+  "../data/cnbv/processed/municipios_todos_x11_actualizado_2018.csv")
 
 
 
@@ -222,6 +222,13 @@ spr_final_prueba <- spr_final_tent %>%
 
 View(spr_final_prueba)
 
+### agregado 17 de nov ...
+spr_final_prueba_muns <- spr_final_tent %>% 
+  group_by(CVEMUN ,banco, fecha) %>% 
+  summarize(trans = sum(trans, na.rm = T)) %>%
+  filter(str_sub(CVEMUN, 1, 2) == "14")
+
+View(spr_final_prueba_muns)
 
 
 ### Comprobar los x11 generados y las fuentes. 
@@ -255,13 +262,18 @@ spr_final <- spr_final_tent %>%
   bind_rows(corte_sust)
 
 write_csv(spr_final,
-  "../data/cnbv/processed/municipios_select_x11_actualizado.csv")
+  "../data/cnbv/processed/municipios_select_x11_actualizado_2018.csv")
 
 
 cnbv_input_ <- read_csv("../data/cnbv/processed" %>% file.path(
-      "municipios_select_x11_actualizado.csv")) %>% 
+      "municipios_select_x11_actualizado_2018.csv")) %>% 
   gather("fecha", "cnbv_x11", starts_with("20"), convert = TRUE) %>% 
-  spread(banco, cnbv_x11, fill = 0) %>% 
+  spread(banco, cnbv_x11, fill = 0) 
+
+write_csv(cnbv_input_,
+          "../data/cnbv/processed/municipios_select_x11_actualizado_2018.csv")
+cnbv_input_ <- read_csv("../data/cnbv/processed" %>% file.path(
+  "municipios_select_x11_actualizado_2018.csv")) %>% 
   transmute(CVEMUN = CVEMUN, fecha = fecha, 
       todos_x11 = valor, 
       otros_x11 = otros, 

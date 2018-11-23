@@ -33,6 +33,9 @@ estados_selecto <- muns_selecto %>%
   summarize(atm_selecto = sum(selecto_x11), 
       predictor_x11 = max(predictor_x11))
 
+
+
+
 gg_selecto <- estados_selecto %>% 
   ggplot(aes(trimestre, atm_selecto)) + 
   facet_wrap(~CVEENT, scales = "free_y") +
@@ -58,10 +61,15 @@ write_csv(metros_selecto,
   "../data/cnbv/processed/x11_selecto_zonas_metro_martes_actualizado.csv")
   
 
+muns_selecto <- muns_selecto %>% 
+  group_by(trimestre, CVEMUN) %>% 
+  summarize(atm_selecto = sum(selecto_x11), 
+            predictor_x11 = max(predictor_x11))
 
 
 
-
+write_csv(muns_selecto, 
+          "../data/cnbv/processed/x11_selecto_municipios_martes_actualizado.csv")
 
 
 
